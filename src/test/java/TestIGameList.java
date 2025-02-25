@@ -6,6 +6,7 @@ import student.BoardGame;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import student.Planner;
 import student.IPlanner;
@@ -46,4 +47,15 @@ public class TestIGameList {
     assertEquals(List.of(), games.getGameNames());
   }
 
+  /**
+   * Test addToList() method
+   */
+  @Test
+  public void testAddToList() {
+    BoardGame game = new BoardGame("17 days", 6, 1, 8, 70, 70, 9.0, 600, 9.0, 2005);
+    Stream<BoardGame> gameStream = Stream.of(game);
+    games.addToList("17 days", gameStream);
+
+    assertEquals(games.getGameNames(), List.of("17 days"));
+  }
 }
