@@ -51,7 +51,7 @@ public class TestIGameList {
    * Test addToList() method
    */
   @Test
-  public void testAddToList() {
+  public void testAddToListGameName() {
     BoardGame game = new BoardGame("17 days", 6, 1, 8, 70, 70, 9.0, 600, 9.0, 2005);
     Stream<BoardGame> gameStream = Stream.of(game);
     games.addToList("17 days", gameStream);
