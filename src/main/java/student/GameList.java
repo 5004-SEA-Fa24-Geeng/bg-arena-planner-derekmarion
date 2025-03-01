@@ -86,8 +86,9 @@ public class GameList implements IGameList {
     List<BoardGame> filteredList = filtered.collect(Collectors.toList());
 
     // Case 1: Add all games to list
-    if (trimmedStr.equals("all")) {
+    if (trimmedStr.matches("all")) {
       games.addAll(filteredList);
+      return;
     }
 
     // Case 2: Check for range e.g. 1-5
@@ -109,7 +110,7 @@ public class GameList implements IGameList {
     }
 
     // Case 3: Single number input
-    if (trimmedStr.matches("//d+")) {
+    if (trimmedStr.matches("\\d+")) {
       int index = Integer.parseInt(trimmedStr);
 
       // Validate index
@@ -130,7 +131,7 @@ public class GameList implements IGameList {
     if (game.isPresent()) {
       games.add(game.get());
     } else {
-      throw new IllegalArgumentException("Game not found" + trimmedStr);
+      throw new IllegalArgumentException("Game not found: " + trimmedStr);
     }
   }
 

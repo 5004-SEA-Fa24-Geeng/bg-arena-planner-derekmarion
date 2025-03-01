@@ -25,6 +25,9 @@ public class TestIGameList {
 
   private GameList games;
 
+  BoardGame game1 = new BoardGame("17 days", 6, 1, 8, 70, 70, 9.0, 600, 9.0, 2005);
+  BoardGame game2 = new BoardGame("20 days", 6, 1, 8, 70, 70, 9.0, 600, 9.0, 2005);
+
   @BeforeEach
   public void setup() {
     games = new GameList();
@@ -52,10 +55,43 @@ public class TestIGameList {
    */
   @Test
   public void testAddToListGameName() {
-    BoardGame game = new BoardGame("17 days", 6, 1, 8, 70, 70, 9.0, 600, 9.0, 2005);
-    Stream<BoardGame> gameStream = Stream.of(game);
+    Stream<BoardGame> gameStream = Stream.of(game1);
     games.addToList("17 days", gameStream);
 
     assertEquals(games.getGameNames(), List.of("17 days"));
+  }
+
+  @Test
+  public void testAddToListSingleNumber() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+    games.addToList("1", gameStream);
+
+    assertEquals(games.getGameNames(), List.of("17 days"));
+  }
+
+  @Test
+  public void testAddToListRange() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+    games.addToList("1-2", gameStream);
+
+    assertEquals(games.getGameNames(), List.of("17 days", "20 days"));
+  }
+
+  @Test
+  public void testAddToListAll() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+    games.addToList("all", gameStream);
+
+    assertEquals(games.getGameNames(), List.of("17 days", "20 days"));
+  }
+
+  @Test
+  public void testGameNotFound() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> games.addToList("random", gameStream));
+
+    assertEquals("Game not found: random", exception.getMessage());
   }
 }
