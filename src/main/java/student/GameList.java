@@ -36,10 +36,14 @@ public class GameList implements IGameList {
     games.clear();
   }
 
+  /**
+   * Counts/returns the number of games in the list.
+   * 
+   * @return the number of games in the list.
+   */
   @Override
   public int count() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'count'");
+    return games.size();
   }
 
   @Override

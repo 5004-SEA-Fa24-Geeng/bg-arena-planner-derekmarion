@@ -187,4 +187,15 @@ public class TestIGameList {
 
     assertEquals("Invalid selection: 100", exception.getMessage());
   }
+
+  /**
+   * Test the count() method
+   */
+  @Test
+  public void testCount() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+    games.addToList("all", gameStream);
+
+    assertEquals(games.count(), 2);
+  }
 }
