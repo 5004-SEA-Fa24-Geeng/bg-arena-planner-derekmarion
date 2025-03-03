@@ -78,6 +78,26 @@ public class TestIGameList {
   }
 
   @Test
+  public void testAddToListBadRange() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> games.addToList("1-3", gameStream));
+
+    assertEquals("Invalid range: 1-3", exception.getMessage());
+  }
+
+  @Test
+  public void testAddToListBadSelection() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> games.addToList("100", gameStream));
+
+    assertEquals("Invalid selection: 100", exception.getMessage());
+  }
+
+  @Test
   public void testAddToListAll() {
     Stream<BoardGame> gameStream = Stream.of(game1, game2);
     games.addToList("all", gameStream);
@@ -93,5 +113,78 @@ public class TestIGameList {
         () -> games.addToList("random", gameStream));
 
     assertEquals("Game not found: random", exception.getMessage());
+  }
+
+  /**
+   * Test the removeFromList method
+   *
+   */
+  @Test
+  public void testRemoveFromListGameName() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+    games.addToList("all", gameStream);
+    games.removeFromList("17 days");
+
+    assertEquals(games.getGameNames(), List.of("20 days"));
+  }
+
+  @Test
+  public void testRemoveFromListSingleNumber() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+    games.addToList("all", gameStream);
+    games.removeFromList("1");
+
+    assertEquals(games.getGameNames(), List.of("20 days"));
+  }
+
+  @Test
+  public void testRemoveFromListRange() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+    games.addToList("all", gameStream);
+    games.removeFromList("1-2");
+
+    assertEquals(games.getGameNames(), List.of());
+  }
+
+  @Test
+  public void testRemoveFromListAll() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+    games.addToList("all", gameStream);
+    games.removeFromList("all");
+
+    assertEquals(games.getGameNames(), List.of());
+  }
+
+  @Test
+  public void testGameNotFoundRemoval() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+    games.addToList("all", gameStream);
+
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> games.removeFromList("random"));
+
+    assertEquals("Game not found: random", exception.getMessage());
+  }
+
+  @Test
+  public void testRemoveFromListBadRange() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+    games.addToList("all", gameStream);
+
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> games.removeFromList("1-3"));
+
+    assertEquals("Invalid range: 1-3", exception.getMessage());
+  }
+
+  @Test
+  public void testRemoveFromListBadSelection() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+    games.addToList("all", gameStream);
+
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> games.removeFromList("100"));
+
+    assertEquals("Invalid selection: 100", exception.getMessage());
   }
 }
