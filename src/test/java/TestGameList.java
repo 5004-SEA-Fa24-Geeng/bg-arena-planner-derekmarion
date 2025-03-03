@@ -1,13 +1,19 @@
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.io.FileReader;
+import java.io.BufferedReader;
 import student.BoardGame;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-
+import java.nio.file.Path;
 import student.Planner;
 import student.IPlanner;
 import student.GameData;
@@ -21,7 +27,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * Just a sample test to get you started, also using
  * setup to help out.
  */
-public class TestIGameList {
+public class TestGameList {
+
+  @TempDir
+  Path tempDir;
 
   private GameList games;
 
@@ -197,5 +206,34 @@ public class TestIGameList {
     games.addToList("all", gameStream);
 
     assertEquals(games.count(), 2);
+  }
+
+  /**
+   * Test the saveGame() method
+   */
+  @Test
+  public void testSaveGame() throws IOException {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+    games.addToList("all", gameStream);
+
+    String testFileName = tempDir.resolve("testFile.txt").toString();
+    games.saveGame(testFileName);
+
+    List<String> expectedLines = games.getGameNames();
+    List<String> actualLines = readLinesFromFile(testFileName);
+
+    assertEquals(expectedLines, actualLines);
+  }
+
+  // Helper method to read file contents
+  private List<String> readLinesFromFile(String filename) throws IOException {
+    List<String> lines = new java.util.ArrayList<>();
+    try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        lines.add(line);
+      }
+    }
+    return lines;
   }
 }

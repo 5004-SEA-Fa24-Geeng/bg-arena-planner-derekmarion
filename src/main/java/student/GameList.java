@@ -1,5 +1,9 @@
 package student;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOError;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -7,6 +11,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class GameList implements IGameList {
+
+  /**
+   * Default key word to use to add or remove an entire filter from/to the list.
+   */
+  String ADD_ALL = "all";
 
   private List<BoardGame> games;
 
@@ -18,9 +27,10 @@ public class GameList implements IGameList {
   }
 
   /**
-   * Getter for game names
-   *
-   * @return game names
+   * Gets the contents of a list, as list of names (Strings) in ascending order
+   * ignoring case.
+   * 
+   * @return the list of game names in ascending order ignoring case.
    */
   @Override
   public List<String> getGameNames() {
@@ -46,10 +56,28 @@ public class GameList implements IGameList {
     return games.size();
   }
 
+  /**
+   * Saves the list of games to a file.
+   * 
+   * The contents of the file will be each game name on a new line. It will
+   * overwrite the file if
+   * it already exists.
+   * 
+   * Saves them in the same order as getGameNames.
+   * 
+   * @param filename The name of the file to save the list to.
+   */
   @Override
   public void saveGame(String filename) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'saveGame'");
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+      for (String gameName : this.getGameNames()) {
+        writer.write(gameName);
+        writer.newLine();
+      }
+      System.out.println("File written successfully");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -92,7 +120,7 @@ public class GameList implements IGameList {
     List<BoardGame> filteredList = filtered.collect(Collectors.toList());
 
     // Case 1: Add all games to list
-    if (trimmedStr.matches("all")) {
+    if (trimmedStr.matches(ADD_ALL)) {
       games.addAll(filteredList);
       return;
     }
@@ -171,7 +199,7 @@ public class GameList implements IGameList {
     String trimmedStr = str.trim().toLowerCase();
 
     // Case 1: Remove a all games from the list
-    if (trimmedStr.matches("all")) {
+    if (trimmedStr.matches(ADD_ALL)) {
       games.clear();
       return;
     }
