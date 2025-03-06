@@ -2,8 +2,12 @@ package student;
 
 import java.util.Set;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import student.Operations;
 import student.GameData;
@@ -30,9 +34,11 @@ import student.GameData;
 public class Planner implements IPlanner {
 
   private Set<BoardGame> games;
+  private List<BoardGame> filteredGames;
 
   public Planner(Set<BoardGame> games) {
     this.games = games;
+    this.filteredGames = List.of();
   }
 
   /**
@@ -51,7 +57,7 @@ public class Planner implements IPlanner {
     Operations operator = Operations.getOperatorFromStr(filter);
     if (operator == null) {
       System.out.println("No operator detected");
-      return games.stream();
+      return filteredGames.stream();
     }
 
     // Parse search term and column name
@@ -61,12 +67,20 @@ public class Planner implements IPlanner {
       column = GameData.fromString(parsedFilter[0]);
     } catch (IllegalArgumentException e) {
       System.out.println(e);
-      return games.stream();
+      return filteredGames.stream();
     }
 
     String searchTerm = parsedFilter[1];
 
-    return games.stream().filter(game -> matchesFilter(game, column, operator, searchTerm));
+    // Ensures filters will be applied cumulatively
+    if (filteredGames.isEmpty()) {
+      filteredGames = games.stream().filter(game -> matchesFilter(game, column, operator, searchTerm))
+          .collect(Collectors.toList());
+    } else {
+      filteredGames = filteredGames.stream().filter(game -> matchesFilter(game, column, operator, searchTerm))
+          .collect(Collectors.toList());
+    }
+    return filteredGames.stream();
   }
 
   /**
@@ -223,16 +237,47 @@ public class Planner implements IPlanner {
     }
   }
 
+  /**
+   * Filters the board games by the passed in text filter. Assumes the results are
+   * sorted in
+   * ascending order.
+   * 
+   * @param filter The filter to apply to the board games.
+   * @param sortOn The column to sort the results on.
+   * @return A stream of board games that match the filter.
+   * @see #filter(String, GameData, boolean)
+   */
   @Override
   public Stream<BoardGame> filter(String filter, GameData sortOn) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'filter'");
+
+    filteredGames = filter(filter).sorted(COMPARATORS.get(sortOn)).collect(Collectors.toList());
+    return filteredGames.stream();
   }
+
+  private static final Map<GameData, Comparator<BoardGame>> COMPARATORS = Map.of(
+      GameData.NAME, Comparator.comparing(game -> game.getName().toLowerCase()),
+      GameData.ID, Comparator.comparing(BoardGame::getId),
+      GameData.RATING, Comparator.comparing(BoardGame::getRating),
+      GameData.DIFFICULTY, Comparator.comparing(BoardGame::getDifficulty),
+      GameData.RANK, Comparator.comparing(BoardGame::getRank),
+      GameData.MIN_PLAYERS, Comparator.comparing(BoardGame::getMinPlayers),
+      GameData.MAX_PLAYERS, Comparator.comparing(BoardGame::getMaxPlayers),
+      GameData.MIN_TIME, Comparator.comparing(BoardGame::getMinPlayTime),
+      GameData.MAX_TIME, Comparator.comparing(BoardGame::getMaxPlayTime),
+      GameData.YEAR, Comparator.comparing(BoardGame::getYearPublished));
 
   @Override
   public Stream<BoardGame> filter(String filter, GameData sortOn, boolean ascending) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'filter'");
+    // Initialize the comparator in advance
+    Comparator<BoardGame> comparator = COMPARATORS.get(sortOn);
+
+    // Reverse comparator if ascending is false
+    if (!ascending) {
+      comparator = comparator.reversed();
+    }
+
+    filteredGames = filter(filter).sorted(comparator).collect(Collectors.toList());
+    return filteredGames.stream();
   }
 
   @Override

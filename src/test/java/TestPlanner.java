@@ -7,8 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-
+import java.util.stream.Collectors;
 import student.Planner;
 import student.IPlanner;
 import student.GameData;
@@ -37,6 +36,9 @@ public class TestPlanner {
     games.add(new BoardGame("Tucano", 5, 10, 20, 60, 90, 6.0, 500, 8.0, 2004));
   }
 
+  /**
+   * Test the filter method with only filter arg
+   */
   @Test
   public void testFilterName() {
     IPlanner planner = new Planner(games);
@@ -95,8 +97,111 @@ public class TestPlanner {
     assertTrue(filtered.isEmpty(), "Non-matching filter should return an empty list");
   }
 
+  /**
+   * Test the filter method with sortOn
+   */
   @Test
-  void testParseFilter() {
+  void testFilterByNamePartial() {
+    // Test filtering games with "Go" in the name (this is a case-insensitive
+    // operation)
+    IPlanner planner = new Planner(games);
+    List<BoardGame> filteredGames = planner.filter("name ~= Go")
+        .collect(Collectors.toList());
+    assertEquals(4, filteredGames.size(), "Should find 4 games with 'Go' in the name");
+    assertTrue(filteredGames.stream().allMatch(game -> game.getName().toLowerCase().contains("go")),
+        "All filtered games should contain 'go'");
+  }
+
+  @Test
+  void testFilterByNameNoMatches() {
+    // Test filtering with no matches
+    IPlanner planner = new Planner(games);
+    List<BoardGame> filteredGames = planner.filter("name ~= namenotfound")
+        .collect(Collectors.toList());
+
+    assertTrue(filteredGames.isEmpty(), "Should return empty list for no matches");
+  }
+
+  @Test
+  void testFilterByNameSortedAlphabetically() {
+    // Test filtering and sorting by name
+    IPlanner planner = new Planner(games);
+    List<String> filteredNames = planner.filter("name ~= Go", GameData.NAME)
+        .map(BoardGame::getName)
+        .collect(Collectors.toList());
+
+    assertEquals(List.of("Go", "Go Fish", "golang", "GoRami"), filteredNames,
+        "Should sort 'Go' games alphabetically");
+  }
+
+  @Test
+  void testFilterByYearSorted() {
+    // Test filtering and sorting by year
+    IPlanner planner = new Planner(games);
+    List<Integer> filteredYears = planner.filter("name ~= Go", GameData.YEAR)
+        .map(BoardGame::getYearPublished)
+        .collect(Collectors.toList());
+
+    assertEquals(List.of(2000, 2001, 2002, 2003), filteredYears,
+        "Should sort 'Go' games by year");
+  }
+
+  @Test
+  void testFilterByRatingSorted() {
+    // Test filtering and sorting by rating
+    IPlanner planner = new Planner(games);
+    List<Double> filteredRatings = planner.filter("name ~= Go", GameData.RATING)
+        .map(BoardGame::getRating)
+        .collect(Collectors.toList());
+
+    assertEquals(List.of(6.5, 7.5, 8.5, 9.5), filteredRatings,
+        "Should sort 'Go' games by rating");
+  }
+
+  @Test
+  void testFilterByPlayerCount() {
+    // Test filtering by player count
+    IPlanner planner = new Planner(games);
+    List<BoardGame> filteredGames = planner.filter("minplayers == 2")
+        .collect(Collectors.toList());
+
+    assertEquals(4, filteredGames.size(), "Should find games with 2 players");
+    assertTrue(filteredGames.stream().allMatch(game -> game.getMinPlayers() <= 2 && game.getMaxPlayers() >= 2),
+        "All filtered games should support 2 players");
+  }
+
+  @Test
+  void testFilterByPlayTime() {
+    // Test filtering by play time
+    IPlanner planner = new Planner(games);
+    List<BoardGame> filteredGames = planner.filter("minplaytime == 30")
+        .collect(Collectors.toList());
+
+    assertEquals(1, filteredGames.size(), "Should find games with 30-minute play time");
+    assertTrue(filteredGames.stream().anyMatch(game -> game.getName().equals("Go")),
+        "Should include 'Go' game");
+  }
+
+  /**
+   * Test filter, sortOn, ascending method signature
+   */
+  @Test
+  void testFilterByRatingSortedDescending() {
+    // Test filtering and sorting by rating in descending order
+    IPlanner planner = new Planner(games);
+    List<Double> filteredRatings = planner.filter("name ~= Go", GameData.RATING, false)
+        .map(BoardGame::getRating)
+        .collect(Collectors.toList());
+
+    assertEquals(List.of(9.5, 8.5, 7.5, 6.5), filteredRatings,
+        "Should sort 'Go' games by rating");
+  }
+
+  /**
+   * Test the testParseFilter method
+   */
+  @Test
+  public void testParseFilter() {
     Planner planner = new Planner(games);
 
     // Assuming Operations is an enum with .toString() returning the operator as a
