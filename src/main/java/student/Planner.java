@@ -106,34 +106,34 @@ public class Planner implements IPlanner {
     Object gameValue;
 
     switch (column) {
-      case GameData.NAME:
+      case NAME:
         gameValue = game.getName();
         break;
-      case GameData.ID:
+      case ID:
         gameValue = game.getId();
         break;
-      case GameData.RATING:
+      case RATING:
         gameValue = game.getRating();
         break;
-      case GameData.DIFFICULTY:
+      case DIFFICULTY:
         gameValue = game.getDifficulty();
         break;
-      case GameData.RANK:
+      case RANK:
         gameValue = game.getRank();
         break;
-      case GameData.MIN_PLAYERS:
+      case MIN_PLAYERS:
         gameValue = game.getMinPlayers();
         break;
-      case GameData.MAX_PLAYERS:
+      case MAX_PLAYERS:
         gameValue = game.getMaxPlayers();
         break;
-      case GameData.MIN_TIME:
+      case MIN_TIME:
         gameValue = game.getMinPlayTime();
         break;
-      case GameData.MAX_TIME:
+      case MAX_TIME:
         gameValue = game.getMaxPlayTime();
         break;
-      case GameData.YEAR:
+      case YEAR:
         gameValue = game.getYearPublished();
         break;
       default:
@@ -173,11 +173,11 @@ public class Planner implements IPlanner {
    */
   private boolean applyStringOperator(String value, Operations operator, String searchTerm) {
     switch (operator) {
-      case Operations.EQUALS:
+      case EQUALS:
         return value.equalsIgnoreCase(searchTerm);
-      case Operations.NOT_EQUALS:
+      case NOT_EQUALS:
         return !value.equalsIgnoreCase(searchTerm);
-      case Operations.CONTAINS:
+      case CONTAINS:
         return value.toLowerCase().contains(searchTerm.toLowerCase());
       default:
         return false; // Unsupported operator for Strings
