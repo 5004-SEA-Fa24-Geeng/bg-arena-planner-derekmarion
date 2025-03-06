@@ -51,14 +51,14 @@ public class TestPlanner {
   public void testFilterInvalidOperator() {
     IPlanner planner = new Planner(games);
     List<BoardGame> filtered = planner.filter("name ## Go").toList();
-    assertEquals(games.size(), filtered.size(), "Invalid operator should return all games");
+    assertEquals(List.of(), filtered, "Invalid operator should return most recent filter");
   }
 
   @Test
   public void testFilterInvalidColumn() {
     IPlanner planner = new Planner(games);
     List<BoardGame> filtered = planner.filter("invalidColumn == Go").toList();
-    assertEquals(games.size(), filtered.size(), "Invalid column should return all games");
+    assertEquals(List.of(), filtered, "Invalid column should return most recent filter");
   }
 
   @Test
@@ -195,6 +195,22 @@ public class TestPlanner {
 
     assertEquals(List.of(9.5, 8.5, 7.5, 6.5), filteredRatings,
         "Should sort 'Go' games by rating");
+  }
+
+  /**
+   * Test the reset() method
+   */
+  @Test
+  void testReset() {
+    Planner planner = new Planner(games);
+    List<Double> filtered = planner.filter("name ~= Go", GameData.RATING, false)
+        .map(BoardGame::getRating)
+        .collect(Collectors.toList());
+
+    assertEquals(List.of(9.5, 8.5, 7.5, 6.5), filtered,
+        "Should sort 'Go' games by rating");
+    planner.reset();
+    assertEquals(List.of(), planner.getFilteredGames());
   }
 
   /**

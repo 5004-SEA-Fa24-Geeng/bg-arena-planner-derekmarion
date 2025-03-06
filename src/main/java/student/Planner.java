@@ -84,6 +84,15 @@ public class Planner implements IPlanner {
   }
 
   /**
+   * Getter for filteredGames
+   * 
+   * @return List of filtered games
+   */
+  public List<BoardGame> getFilteredGames() {
+    return filteredGames;
+  }
+
+  /**
    * Checks if a game matches filter
    *
    * @param game
@@ -282,8 +291,7 @@ public class Planner implements IPlanner {
 
   @Override
   public void reset() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'reset'");
+    filteredGames = List.of();
   }
 
   /**
