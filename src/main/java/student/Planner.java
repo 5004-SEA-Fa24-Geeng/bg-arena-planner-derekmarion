@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,7 +39,7 @@ public class Planner implements IPlanner {
 
   public Planner(Set<BoardGame> games) {
     this.games = games;
-    this.filteredGames = Set.of();
+    this.filteredGames = new HashSet<>(games);
   }
 
   /**
@@ -53,30 +54,31 @@ public class Planner implements IPlanner {
    */
   @Override
   public Stream<BoardGame> filter(String filter) {
-    // Get operator
-    Operations operator = Operations.getOperatorFromStr(filter);
-    if (operator == null) {
-      System.out.println("No operator detected");
-      return filteredGames.stream();
-    }
 
-    // Parse search term and column name
-    String[] parsedFilter = parseFilter(filter, operator);
-    GameData column;
-    try {
-      column = GameData.fromString(parsedFilter[0]);
-    } catch (IllegalArgumentException e) {
-      System.out.println(e);
-      return filteredGames.stream();
-    }
+    // Split filter string on commas to support multiple filter operations
+    String[] filterParts = filter.split(",");
 
-    String searchTerm = parsedFilter[1];
+    for (String filterPart : filterParts) {
+      // Get operator
+      Operations operator = Operations.getOperatorFromStr(filterPart);
+      if (operator == null) {
+        System.out.println("No operator detected");
+        continue;
+      }
 
-    // Ensures filters will be applied cumulatively
-    if (filteredGames.isEmpty()) {
-      filteredGames = games.stream().filter(game -> matchesFilter(game, column, operator, searchTerm))
-          .collect(Collectors.toSet());
-    } else {
+      // Parse search term and column name
+      String[] parsedFilter = parseFilter(filterPart, operator);
+      GameData column;
+      try {
+        column = GameData.fromString(parsedFilter[0]);
+      } catch (IllegalArgumentException e) {
+        System.out.println(e);
+        return filteredGames.stream();
+      }
+
+      String searchTerm = parsedFilter[1];
+
+      // Apply filtering
       filteredGames = filteredGames.stream().filter(game -> matchesFilter(game, column, operator, searchTerm))
           .collect(Collectors.toSet());
     }

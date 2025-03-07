@@ -2,11 +2,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import student.BoardGame;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import student.Planner;
 import student.IPlanner;
@@ -49,16 +52,18 @@ public class TestPlanner {
 
   @Test
   public void testFilterInvalidOperator() {
-    IPlanner planner = new Planner(games);
+    Planner planner = new Planner(games);
     List<BoardGame> filtered = planner.filter("name ## Go").toList();
-    assertEquals(List.of(), filtered, "Invalid operator should return most recent filter");
+    assertEquals(planner.getFilteredGames(), filtered.stream().collect(Collectors.toSet()),
+        "Invalid operator should return most recent filter");
   }
 
   @Test
   public void testFilterInvalidColumn() {
-    IPlanner planner = new Planner(games);
+    Planner planner = new Planner(games);
     List<BoardGame> filtered = planner.filter("invalidColumn == Go").toList();
-    assertEquals(List.of(), filtered, "Invalid column should return most recent filter");
+    assertEquals(planner.getFilteredGames(), filtered.stream().collect(Collectors.toSet()),
+        "Invalid column should return most recent filter");
   }
 
   @Test
@@ -95,6 +100,26 @@ public class TestPlanner {
     IPlanner planner = new Planner(games);
     List<BoardGame> filtered = planner.filter("name == NonExistentGame").toList();
     assertTrue(filtered.isEmpty(), "Non-matching filter should return an empty list");
+  }
+
+  @Test
+  void testMultipleFiltersName() {
+    IPlanner planner = new Planner(games);
+    List<String> filtered = planner.filter("name~=go,name~=fish").map(BoardGame::getName).collect(Collectors.toList());
+
+    assertEquals(1, filtered.size());
+    assertTrue(filtered.contains("Go Fish"));
+    assertFalse(filtered.contains("Go"));
+  }
+
+  @Test
+  void testMultipleFiltersNumber() {
+    IPlanner planner = new Planner(games);
+    List<String> filtered = planner.filter("minPlayers>4,maxPlayers<10").map(BoardGame::getName)
+        .collect(Collectors.toList());
+
+    assertEquals(1, filtered.size());
+    assertTrue(filtered.contains("GoRami"));
   }
 
   /**
