@@ -210,7 +210,7 @@ public class TestPlanner {
     assertEquals(List.of(9.5, 8.5, 7.5, 6.5), filtered,
         "Should sort 'Go' games by rating");
     planner.reset();
-    assertEquals(List.of(), planner.getFilteredGames());
+    assertEquals(Set.of(), planner.getFilteredGames());
   }
 
   /**

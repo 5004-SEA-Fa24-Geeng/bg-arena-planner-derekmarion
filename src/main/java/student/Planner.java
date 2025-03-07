@@ -34,11 +34,11 @@ import student.GameData;
 public class Planner implements IPlanner {
 
   private Set<BoardGame> games;
-  private List<BoardGame> filteredGames;
+  private Set<BoardGame> filteredGames;
 
   public Planner(Set<BoardGame> games) {
     this.games = games;
-    this.filteredGames = List.of();
+    this.filteredGames = Set.of();
   }
 
   /**
@@ -75,12 +75,12 @@ public class Planner implements IPlanner {
     // Ensures filters will be applied cumulatively
     if (filteredGames.isEmpty()) {
       filteredGames = games.stream().filter(game -> matchesFilter(game, column, operator, searchTerm))
-          .collect(Collectors.toList());
+          .collect(Collectors.toSet());
     } else {
       filteredGames = filteredGames.stream().filter(game -> matchesFilter(game, column, operator, searchTerm))
-          .collect(Collectors.toList());
+          .collect(Collectors.toSet());
     }
-    return filteredGames.stream();
+    return filteredGames.stream().sorted(Comparator.comparing(BoardGame::getName));
   }
 
   /**
@@ -88,7 +88,7 @@ public class Planner implements IPlanner {
    * 
    * @return List of filtered games
    */
-  public List<BoardGame> getFilteredGames() {
+  public Set<BoardGame> getFilteredGames() {
     return filteredGames;
   }
 
@@ -259,8 +259,8 @@ public class Planner implements IPlanner {
   @Override
   public Stream<BoardGame> filter(String filter, GameData sortOn) {
 
-    filteredGames = filter(filter).sorted(COMPARATORS.get(sortOn)).collect(Collectors.toList());
-    return filteredGames.stream();
+    filteredGames = filter(filter).collect(Collectors.toSet());
+    return filteredGames.stream().sorted(COMPARATORS.get(sortOn));
   }
 
   private static final Map<GameData, Comparator<BoardGame>> COMPARATORS = Map.of(
@@ -285,13 +285,13 @@ public class Planner implements IPlanner {
       comparator = comparator.reversed();
     }
 
-    filteredGames = filter(filter).sorted(comparator).collect(Collectors.toList());
-    return filteredGames.stream();
+    filteredGames = filter(filter).collect(Collectors.toSet());
+    return filteredGames.stream().sorted(comparator);
   }
 
   @Override
   public void reset() {
-    filteredGames = List.of();
+    filteredGames = Set.of();
   }
 
   /**
