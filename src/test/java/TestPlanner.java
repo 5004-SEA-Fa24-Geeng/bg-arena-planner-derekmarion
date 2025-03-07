@@ -105,11 +105,10 @@ public class TestPlanner {
     // Test filtering games with "Go" in the name (this is a case-insensitive
     // operation)
     IPlanner planner = new Planner(games);
-    List<BoardGame> filteredGames = planner.filter("name ~= Go")
+    List<String> filteredGames = planner.filter("name ~= Go").map(BoardGame::getName)
         .collect(Collectors.toList());
+    assertEquals(filteredGames, List.of("Go", "Go Fish", "golang", "GoRami"));
     assertEquals(4, filteredGames.size(), "Should find 4 games with 'Go' in the name");
-    assertTrue(filteredGames.stream().allMatch(game -> game.getName().toLowerCase().contains("go")),
-        "All filtered games should contain 'go'");
   }
 
   @Test

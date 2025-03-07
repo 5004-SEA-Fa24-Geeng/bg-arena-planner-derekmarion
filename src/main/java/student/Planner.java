@@ -80,7 +80,7 @@ public class Planner implements IPlanner {
       filteredGames = filteredGames.stream().filter(game -> matchesFilter(game, column, operator, searchTerm))
           .collect(Collectors.toSet());
     }
-    return filteredGames.stream().sorted(Comparator.comparing(BoardGame::getName));
+    return filteredGames.stream().sorted(Comparator.comparing(game -> game.getName().toLowerCase()));
   }
 
   /**
