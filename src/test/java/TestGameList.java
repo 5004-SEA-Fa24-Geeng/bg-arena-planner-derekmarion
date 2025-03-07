@@ -64,7 +64,7 @@ public class TestGameList {
    */
   @Test
   public void testAddToListGameName() {
-    Stream<BoardGame> gameStream = Stream.of(game1);
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
     games.addToList("17 days", gameStream);
 
     assertEquals(games.getGameNames(), List.of("17 days"));
@@ -83,7 +83,16 @@ public class TestGameList {
     Stream<BoardGame> gameStream = Stream.of(game1, game2);
     games.addToList("1-2", gameStream);
 
-    assertEquals(games.getGameNames(), List.of("17 days", "20 days"));
+    assertEquals(games.getGameNames(), List.of("20 days", "17 days"));
+  }
+
+  @Test
+  public void testAddToListRangeSingleNumber() {
+    Stream<BoardGame> gameStream = Stream.of(game1, game2);
+    games.addToList("1-1", gameStream);
+
+    assertEquals(games.getGameNames(), List.of("17 days"));
+
   }
 
   @Test
@@ -111,7 +120,7 @@ public class TestGameList {
     Stream<BoardGame> gameStream = Stream.of(game1, game2);
     games.addToList("all", gameStream);
 
-    assertEquals(games.getGameNames(), List.of("17 days", "20 days"));
+    assertEquals(games.getGameNames(), List.of("20 days", "17 days"));
   }
 
   @Test
@@ -141,7 +150,7 @@ public class TestGameList {
   public void testRemoveFromListSingleNumber() {
     Stream<BoardGame> gameStream = Stream.of(game1, game2);
     games.addToList("all", gameStream);
-    games.removeFromList("1");
+    games.removeFromList("2");
 
     assertEquals(games.getGameNames(), List.of("20 days"));
   }

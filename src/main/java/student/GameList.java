@@ -1,8 +1,9 @@
 package student;
 
+import java.util.Set;
+import java.util.HashSet;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOError;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +18,13 @@ public class GameList implements IGameList {
    */
   String ADD_ALL = "all";
 
-  private List<BoardGame> games;
+  private Set<BoardGame> games;
 
   /**
    * Constructor for the GameList.
    */
   public GameList() {
-    this.games = new ArrayList<>();
+    this.games = new HashSet<>();
   }
 
   /**
@@ -198,6 +199,9 @@ public class GameList implements IGameList {
     // Clean search term
     String trimmedStr = str.trim().toLowerCase();
 
+    // Convert to list to allow indexing
+    List<BoardGame> gameList = new ArrayList<>(games);
+
     // Case 1: Remove a all games from the list
     if (trimmedStr.matches(ADD_ALL)) {
       games.clear();
@@ -215,8 +219,11 @@ public class GameList implements IGameList {
         throw new IllegalArgumentException("Invalid range: " + trimmedStr);
       }
 
+      // Collect elements to remove
+      List<BoardGame> toRemove = new ArrayList<>(gameList.subList(start - 1, end));
+
       // Remove games in provided range (accounting for 0 index)
-      games.subList(start - 1, end).clear();
+      games.removeAll(toRemove);
       return;
     }
 
@@ -230,7 +237,7 @@ public class GameList implements IGameList {
       }
 
       // Remove a single game (adjusted for 0 index)
-      games.remove(games.get(index - 1));
+      games.remove(gameList.get(index - 1));
       return;
     }
 
