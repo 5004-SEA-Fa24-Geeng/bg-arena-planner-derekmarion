@@ -181,6 +181,14 @@ public class Planner implements IPlanner {
         return !value.equalsIgnoreCase(searchTerm);
       case CONTAINS:
         return value.toLowerCase().contains(searchTerm.toLowerCase());
+      case GREATER_THAN_EQUALS:
+        return value.toLowerCase().compareTo(searchTerm.toLowerCase()) >= 0;
+      case GREATER_THAN:
+        return value.toLowerCase().compareTo(searchTerm.toLowerCase()) > 0;
+      case LESS_THAN_EQUALS:
+        return value.toLowerCase().compareTo(searchTerm.toLowerCase()) <= 0;
+      case LESS_THAN:
+        return value.toLowerCase().compareTo(searchTerm.toLowerCase()) < 0;
       default:
         return false; // Unsupported operator for Strings
     }

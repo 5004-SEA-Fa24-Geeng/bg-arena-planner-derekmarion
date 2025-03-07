@@ -130,6 +130,104 @@ public class TestPlanner {
     assertTrue(filtered.contains("GoRami"));
   }
 
+  @Test
+  public void testFilterNameGreaterThan() {
+    IPlanner planner = new Planner(games);
+    List<BoardGame> filtered = planner.filter("name > Go").toList();
+
+    // Expecting "Go Fish", "golang", "GoRami", "Monopoly", "Tucano"
+    assertEquals(5, filtered.size());
+    assertTrue(filtered.stream().noneMatch(game -> game.getName().equalsIgnoreCase("Go") ||
+        game.getName().equalsIgnoreCase("Chess") ||
+        game.getName().equalsIgnoreCase("17 days")));
+    assertTrue(filtered.stream().allMatch(game -> game.getName().compareToIgnoreCase("Go") > 0));
+  }
+
+  @Test
+  public void testFilterNameGreaterThanEquals() {
+    IPlanner planner = new Planner(games);
+    List<BoardGame> filtered = planner.filter("name >= Go").toList();
+
+    // Expecting "Go", "Go Fish", "golang", "GoRami", "Monopoly", "Tucano"
+    assertEquals(6, filtered.size());
+    assertTrue(filtered.stream().noneMatch(game -> game.getName().equalsIgnoreCase("Chess") ||
+        game.getName().equalsIgnoreCase("17 days")));
+    assertTrue(filtered.stream().allMatch(game -> game.getName().compareToIgnoreCase("Go") >= 0));
+  }
+
+  @Test
+  public void testFilterNameLessThan() {
+    IPlanner planner = new Planner(games);
+    List<BoardGame> filtered = planner.filter("name < Go").toList();
+
+    // Expecting "17 days", "Chess"
+    assertEquals(2, filtered.size());
+    assertTrue(filtered.stream().noneMatch(game -> game.getName().equalsIgnoreCase("Go") ||
+        game.getName().equalsIgnoreCase("Go Fish") ||
+        game.getName().equalsIgnoreCase("golang") ||
+        game.getName().equalsIgnoreCase("GoRami") ||
+        game.getName().equalsIgnoreCase("Monopoly") ||
+        game.getName().equalsIgnoreCase("Tucano")));
+    assertTrue(filtered.stream().allMatch(game -> game.getName().compareToIgnoreCase("Go") < 0));
+  }
+
+  @Test
+  public void testFilterNameLessThanEquals() {
+    IPlanner planner = new Planner(games);
+    List<BoardGame> filtered = planner.filter("name <= Go").toList();
+
+    // Expecting "17 days", "Chess", "Go"
+    assertEquals(3, filtered.size());
+    assertTrue(filtered.stream().noneMatch(game -> game.getName().equalsIgnoreCase("Go Fish") ||
+        game.getName().equalsIgnoreCase("golang") ||
+        game.getName().equalsIgnoreCase("GoRami") ||
+        game.getName().equalsIgnoreCase("Monopoly") ||
+        game.getName().equalsIgnoreCase("Tucano")));
+    assertTrue(filtered.stream().allMatch(game -> game.getName().compareToIgnoreCase("Go") <= 0));
+  }
+
+  @Test
+  public void testFilterNameCaseInsensitivity() {
+    IPlanner planner = new Planner(games);
+    List<BoardGame> filtered = planner.filter("name > go").toList();
+
+    // Should be the same result as "name > Go" due to case insensitivity
+    // Expecting "Go Fish", "golang", "GoRami", "Monopoly", "Tucano"
+    assertEquals(5, filtered.size());
+    assertTrue(filtered.stream().noneMatch(game -> game.getName().equalsIgnoreCase("Go") ||
+        game.getName().equalsIgnoreCase("Chess") ||
+        game.getName().equalsIgnoreCase("17 days")));
+  }
+
+  @Test
+  public void testFilterNameBoundaryValues() {
+    IPlanner planner = new Planner(games);
+
+    // Test with a value that falls between two game names alphabetically
+    List<BoardGame> filtered = planner.filter("name < Gooo").toList();
+
+    // Expecting "17 days", "Chess", "Go", "Go Fish", "golang"
+    assertEquals(5, filtered.size());
+    assertTrue(filtered.stream().noneMatch(game -> game.getName().equalsIgnoreCase("GoRami") ||
+        game.getName().equalsIgnoreCase("Monopoly") ||
+        game.getName().equalsIgnoreCase("Tucano")));
+  }
+
+  @Test
+  public void testFilterNameWithMultipleConditions() {
+    IPlanner planner = new Planner(games);
+
+    // Test with multiple conditions involving string comparisons
+    List<BoardGame> filtered = planner.filter("name > Chess, name < Monopoly").toList();
+
+    // Expecting "Go", "Go Fish", "golang", "GoRami"
+    assertEquals(4, filtered.size());
+    assertTrue(filtered.stream().noneMatch(game -> game.getName().equalsIgnoreCase("17 days") ||
+        game.getName().equalsIgnoreCase("Chess") ||
+        game.getName().equalsIgnoreCase("Monopoly") ||
+        game.getName().equalsIgnoreCase("Tucano")));
+  }
+
   /**
    * Test the filter method with sortOn
    */
