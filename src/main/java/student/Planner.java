@@ -299,9 +299,12 @@ public class Planner implements IPlanner {
     return filteredGames.stream().sorted(comparator);
   }
 
+  /**
+   * Resets the list of filtered games to the original set
+   */
   @Override
   public void reset() {
-    filteredGames = Set.of();
+    filteredGames = games;
   }
 
   /**
