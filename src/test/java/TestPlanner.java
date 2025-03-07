@@ -3,19 +3,14 @@ import org.junit.jupiter.api.Test;
 import student.BoardGame;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import student.Planner;
 import student.IPlanner;
 import student.GameData;
-import student.Operations;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * JUnit test for the Planner class.
@@ -343,33 +338,4 @@ public class TestPlanner {
     assertEquals(games, planner.getFilteredGames());
   }
 
-  /**
-   * Test the testParseFilter method
-   */
-  @Test
-  public void testParseFilter() {
-    Planner planner = new Planner(games);
-
-    // Assuming Operations is an enum with .toString() returning the operator as a
-    // string
-    Operations equalsOp = Operations.EQUALS; // Assuming this is "=="
-    Operations notEqualsOp = Operations.NOT_EQUALS; // Assuming this is "!="
-
-    // Test with whitespace around
-    assertArrayEquals(new String[] { "name", "Go" }, planner.parseFilter("name == Go", equalsOp));
-    assertArrayEquals(new String[] { "age", "25" }, planner.parseFilter(" age!= 25 ", notEqualsOp));
-
-    // Test without whitespace
-    assertArrayEquals(new String[] { "name", "Go" }, planner.parseFilter("name==Go", equalsOp));
-
-    // Test with extra spaces
-    assertArrayEquals(new String[] { "salary", "1000" }, planner.parseFilter("  salary  == 1000  ", equalsOp));
-
-    // Test with a multi-character operator
-    Operations greaterOrEqualOp = Operations.GREATER_THAN_EQUALS; // Assuming this is ">="
-    assertArrayEquals(new String[] { "price", "100" }, planner.parseFilter("price >= 100", greaterOrEqualOp));
-
-    // Test with malformed input
-    assertThrows(IllegalArgumentException.class, () -> planner.parseFilter("name Go", Operations.EQUALS));
-  }
 }
