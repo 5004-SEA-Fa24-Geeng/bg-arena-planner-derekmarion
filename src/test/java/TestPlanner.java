@@ -51,6 +51,14 @@ public class TestPlanner {
   }
 
   @Test
+  public void testFilterNameContains() {
+    IPlanner planner = new Planner(games);
+    List<BoardGame> filtered = planner.filter("name ~=Go Fish").toList();
+    assertEquals(1, filtered.size());
+    assertEquals("Go Fish", filtered.get(0).getName());
+  }
+
+  @Test
   public void testFilterInvalidOperator() {
     Planner planner = new Planner(games);
     List<BoardGame> filtered = planner.filter("name ## Go").toList();

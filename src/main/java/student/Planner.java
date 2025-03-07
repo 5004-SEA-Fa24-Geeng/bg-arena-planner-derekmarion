@@ -304,17 +304,15 @@ public class Planner implements IPlanner {
    * @return An array of strings containing column and search term
    */
   public String[] parseFilter(String filter, Operations operator) {
-
-    // Remove whitespace
-    filter = filter.replace(" ", "");
-
-    // Split on operator
-    String[] parsedFilter = filter.split(operator.getOperator());
+    // Split on operator while preserving spaces in search terms
+    String[] parsedFilter = filter.split(operator.getOperator(), 2); // Split into max 2 parts
 
     if (parsedFilter.length < 2) {
       throw new IllegalArgumentException("Input does not contain a valid operation");
     }
-    return parsedFilter;
+
+    // Trim spaces around the column name and search term
+    return new String[] { parsedFilter[0].trim(), parsedFilter[1].trim() };
   }
 
 }
